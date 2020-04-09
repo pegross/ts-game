@@ -1,5 +1,5 @@
-import Entity from "./Entity";
-import Settings from "./Settings";
+import Entity from './Entity';
+import Settings from './Settings';
 
 export default class Bullet extends Entity
 {

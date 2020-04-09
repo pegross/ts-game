@@ -1,6 +1,6 @@
-import Entity from "./Entity";
-import Settings from "./Settings";
-import {DirectionX, DirectionY, State} from "./enums";
+import Entity from './Entity';
+import Settings from './Settings';
+import { DirectionX, DirectionY, State } from './enums';
 
 export default class Player extends Entity
 {

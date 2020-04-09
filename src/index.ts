@@ -1,16 +1,13 @@
 import Game from './Game';
 
-window.onload = function () {
+window.onload = () => {
     const canvas = document.getElementById('game');
 
     if (canvas instanceof HTMLCanvasElement) {
-        let game = Game.make(canvas);
-        game.start();
-
+        Game.setCanvas(canvas).start();
         // @ts-ignore
         window.myGame = Game;
     } else {
-        throw "Canvas passed to game is not a HTMLCanvasElement";
+        throw new Error('Canvas passed to game is not a HTMLCanvasElement');
     }
 };
-

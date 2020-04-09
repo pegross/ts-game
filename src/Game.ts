@@ -1,25 +1,26 @@
-import Entity from "./Entity";
-import Player from "./Player";
-import Bullet from "./Bullet";
-import { DirectionX, DirectionY } from "./enums";
-import Settings from "./Settings";
+import Entity from './Entity';
+import Player from './Player';
+import Bullet from './Bullet';
+import { DirectionX, DirectionY } from './enums';
+import Settings from './Settings';
 
 export default class Game {
 
     private static instance?: Game;
     private entities: Entity[] = [];
 
-    private canvas: HTMLCanvasElement;
-    private context: CanvasRenderingContext2D;
+    // canvas and context must be set before starting the game
+    canvas!: HTMLCanvasElement;
+    context!: CanvasRenderingContext2D;
 
     private playerDirX: DirectionX = DirectionX.NONE;
     private playerDirY: DirectionY = DirectionY.NONE;
 
-    private currentTick: number = 0;
-    private lastTick: number = 0;
-    private lastDraw: number = 0;
+    private currentTick = 0;
+    private lastTick = 0;
+    private lastDraw = 0;
 
-    private constructor(canvas: HTMLCanvasElement) {
+    private constructor() {
         window.addEventListener('keypress', e => {
             console.log(e);
 
@@ -37,46 +38,69 @@ export default class Game {
                     this.playerDirY = DirectionY.DOWN;
             }
 
-            if(e.key !== 'a' && e.key !== 'd') {
+            if (e.key !== 'a' && e.key !== 'd') {
                 this.playerDirX = DirectionX.NONE;
             }
 
-            if(e.key !== 'w' && e.key !== 's') {
+            if (e.key !== 'w' && e.key !== 's') {
                 this.playerDirY = DirectionY.NONE;
             }
         });
 
-        this.canvas = canvas;
-        this.context = <CanvasRenderingContext2D>canvas.getContext('2d');
-        this.alignCanvas();
         window.addEventListener('resize', () => {
             this.alignCanvas();
         });
     }
 
-    public static make(canvas: HTMLCanvasElement): Game {
+    static setCanvas(canvas: HTMLCanvasElement): Game {
+        const game = Game.get();
+        game.canvas = canvas;
+        game.context = (canvas.getContext('2d') as CanvasRenderingContext2D);
+        game.alignCanvas();
+
+        return game;
+    }
+
+    static get(): Game {
         if (this.instance) {
             return this.instance;
         }
-        this.instance = new this(canvas);
-        return this.make(canvas);
+        this.instance = new this();
+        return this.get();
     }
 
-    public static get(): Game | undefined {
-        return this.instance;
+    static registerEntity(entity: Entity) {
+        Game.get().entities.push(entity);
     }
 
-    public registerEntity(entity: Entity) {
-        this.entities.push(entity);
-    }
+    start(): void {
 
-    public start(): void {
+        if (!this.canvas || !this.context) {
+            console.error('Game:start - Game cannot be started before setting the canvas');
+        }
+
+        // tslint:disable-next-line:no-unused-expression
         new Player();
-
         this.loop();
     }
 
-    public execCalc() {
+    static getHeight(): number {
+        const game = Game.get();
+        if (!game.canvas) {
+            return 0;
+        }
+        return game.canvas.height;
+    }
+
+    static getWidth(): number {
+        const game = Game.get();
+        if (!game.canvas) {
+            return 0;
+        }
+        return game.canvas.width;
+    }
+
+    private execCalc() {
         this.entities.forEach((entity) => {
             if (entity instanceof Player) {
                 entity.move(this.playerDirX, this.playerDirY, 1);
@@ -84,7 +108,7 @@ export default class Game {
         });
     }
 
-    public execDraw(): void {
+    private execDraw(): void {
         const sinceLastDraw = this.currentTick - this.lastDraw;
         if (!(this.lastDraw <= 0 || sinceLastDraw > 1000 / Settings.fps)) {
             return;
@@ -97,7 +121,7 @@ export default class Game {
         });
     }
 
-    public loop(): void {
+    private loop(): void {
         console.log('loop');
 
         const now = new Date();
@@ -114,7 +138,12 @@ export default class Game {
         });
     }
 
-    alignCanvas() {
+    private alignCanvas() {
+        if (!this.canvas) {
+            console.error('Game:alignCanvas - canvas is not set');
+            return;
+        }
+
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
         this.execDraw()

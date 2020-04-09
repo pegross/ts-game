@@ -1,8 +1,7 @@
-import Game from "./Game";
-import { DirectionX, DirectionY, State } from "./enums";
+import Game from './Game';
+import { DirectionX, DirectionY, State } from './enums';
 
-export default abstract class Entity
-{
+export default abstract class Entity {
 
     protected state: State;
 
@@ -12,32 +11,41 @@ export default abstract class Entity
     protected width: number;
     protected height: number;
 
-    protected constructor(speed: number, posX: number, posY: number, width: number, height: number)
-    {
-
+    protected constructor(speed: number, posX: number, posY: number, width: number, height: number) {
         this.state = State.IDLE;
-
         this.speed = speed;
         this.posX = posX;
         this.posY = posY;
         this.width = width;
         this.height = height;
 
-        let game = Game.get();
-        if (game) {
-            game.registerEntity(this);
-        }
-
+        Game.registerEntity(this);
     }
 
-    public move(x: DirectionX, y: DirectionY, ms: number): void
-    {
-        if(this.state > State.MOVING) {
+    move(x: DirectionX, y: DirectionY, ms: number): void {
+        if (this.state > State.MOVING) {
             return;
         }
 
-        this.posX += this.speed * ms * x;
-        this.posY += this.speed * ms * y;
+        const addX = this.speed * ms * x;
+        if (this.posX + addX > Game.getWidth()) {
+            this.posX = 0;
+        } else {
+            if (this.posX - addX < 0) {
+                this.posX = Game.getWidth();
+            }
+        }
+        this.posX += addX;
+
+        const addY = this.speed * ms * y;
+        if (this.posY + addY > Game.getHeight()) {
+            this.posY = 0;
+        } else {
+            if (this.posY - addY < 0) {
+                this.posY = Game.getHeight();
+            }
+        }
+        this.posY += addY;
     }
 
     abstract render(ctx: CanvasRenderingContext2D): void;
