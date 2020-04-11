@@ -1,8 +1,9 @@
 import Entity from './Entity';
 import Player from './Player';
 import Bullet from './Bullet';
-import { DirectionX, DirectionY } from './enums';
+import { DirectionX, DirectionY, Side } from './enums';
 import Settings from './Settings';
+import Wall from './Wall';
 
 export default class Game {
 
@@ -19,6 +20,7 @@ export default class Game {
     private currentTick = 0;
     private lastTick = 0;
     private lastDraw = 0;
+    private timePassed = 0;
 
     private constructor() {
         window.addEventListener('keypress', e => {
@@ -81,7 +83,13 @@ export default class Game {
 
         // tslint:disable-next-line:no-unused-expression
         new Player();
+        // tslint:disable-next-line:no-unused-expression
+        new Wall(100, 40, 50, 500);
         this.loop();
+    }
+
+    static getEntities(): Entity[] {
+        return Game.get().entities;
     }
 
     static getHeight(): number {
@@ -102,10 +110,56 @@ export default class Game {
 
     private execCalc() {
         this.entities.forEach((entity) => {
+
+            this.entities.forEach((check) => {
+                if (Game.isCollision(entity, check)) {
+                    console.log('collision');
+                    entity.onCollision(check);
+                    check.onCollision(entity);
+                }
+            });
+
             if (entity instanceof Player) {
-                entity.move(this.playerDirX, this.playerDirY, 1);
+                entity.color = 'blue';
+                entity.move(this.playerDirX, this.playerDirY, this.timePassed);
             }
+
+            // TODO: move other entities
         });
+    }
+
+    static isCollision(p: Entity, q: Entity): Side | false {
+        if (!p.canCollide || !q.canCollide || p === q) {
+            return false;
+        }
+
+        // Main collision handling algorithm (Axis Aligned Bounding Box)
+        if (p.getX() < q.getX() + q.getWidth() && p.getX() + p.getWidth() > q.getX()) {
+            if (p.getY() < q.getY() + q.getHeight() && p.getY() + p.getHeight() > q.getY()) {
+
+                // Collision happened. Detect which side is closest to collision
+                const deltaX = q.getX() > p.getX() ? q.getX() - p.getX() + p.getWidth() : p.getX() - q.getX() + q.getWidth();
+                const deltaY = q.getY() > p.getY() ? q.getY() - p.getY() + p.getHeight() : p.getX() - q.getX() + q.getHeight();
+                console.log('deltaX ' + deltaX);
+                console.log('deltaY ' + deltaY);
+
+                if (deltaX < deltaY) {
+                    if (q.getX() > p.getX() + p.getWidth()) {
+                        return Side.RIGHT
+                    } else {
+                        return Side.LEFT;
+                    }
+                }
+
+                if (q.getY() > p.getY() + p.getHeight()) {
+                    return Side.TOP
+                } else {
+                    return Side.BOTTOM;
+                }
+            }
+        }
+
+        return false;
     }
 
     private execDraw(): void {
@@ -122,12 +176,9 @@ export default class Game {
     }
 
     private loop(): void {
-        console.log('loop');
-
         const now = new Date();
-        console.log(now.getTime());
         this.currentTick = now.getTime();
-        const timePassed = this.lastTick - this.currentTick;
+        this.timePassed = this.lastTick - this.currentTick;
         this.lastTick = this.currentTick;
 
         // this.fetchEvents();

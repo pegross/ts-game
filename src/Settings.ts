@@ -5,7 +5,7 @@ export default class Settings
     static height = 200;
     static width = 300;
 
-    static playerBaseSpeed = 3;
+    static playerBaseSpeed = 0.1;
     static playerStartX: number = Settings.width / 2;
     static playerStartY: number = Settings.height / 2;
     static playerWidth = 20;

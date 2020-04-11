@@ -12,6 +12,14 @@ export enum DirectionY
     UP = -1
 }
 
+export enum Side
+{
+    TOP,
+    RIGHT,
+    BOTTOM,
+    LEFT
+}
+
 export enum State
 {
     IDLE,
