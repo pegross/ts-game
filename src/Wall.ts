@@ -17,6 +17,10 @@ export default class Wall extends Entity {
         ctx.stroke();
     }
 
+    move() {
+        return;
+    }
+
     onCollision(collider: Entity, side: Side): void {
         super.onCollision(collider, side);
     }

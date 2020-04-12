@@ -12,7 +12,11 @@ export default class Player extends Entity {
             Settings.playerStartX,
             Settings.playerStartY,
             Settings.playerWidth,
-            Settings.playerHeight
+            Settings.playerHeight,
+            true,
+            false,
+            false,
+            true
         );
     }
 

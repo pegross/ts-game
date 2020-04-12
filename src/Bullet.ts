@@ -4,19 +4,17 @@ import Settings from './Settings';
 export default class Bullet extends Entity
 {
 
-    constructor(x: number, y: number, size: number)
-    {
-        super(1.5, x, y, size, size);
+    constructor(posX: number, posY: number, width: number) {
+        super(0.05, posX, posY, width, width, true, false, true);
     }
 
     render(ctx: CanvasRenderingContext2D): void
     {
         ctx.beginPath();
-        ctx.arc(this.posX, this.posY, this.width, 0, 2 * Math.PI);
+        ctx.rect(this.posX, this.posY, this.width, this.height);
         ctx.strokeStyle = 'red';
         ctx.fillStyle = 'red';
         ctx.fill();
         ctx.stroke();
-
     }
 }

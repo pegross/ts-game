@@ -75,12 +75,26 @@ export default class Game {
         Game.get().entities.push(entity);
     }
 
+    static deregisterEntity(entity: Entity) {
+        const entities = Game.get().entities;
+
+        for (let i = 0; i <= entities.length; i++) {
+            if (entities[i] === entity) {
+                entities.splice(i, 1);
+                return;
+            }
+        }
+
+    }
+
     start(): void {
 
         if (!this.canvas || !this.context) {
             console.error('Game:start - Game cannot be started before setting the canvas');
         }
 
+        // tslint:disable-next-line:no-unused-expression
+        new Bullet(200, 200, 10);
         // tslint:disable-next-line:no-unused-expression
         new Player();
         // tslint:disable-next-line:no-unused-expression
@@ -111,21 +125,26 @@ export default class Game {
     private execCalc() {
         this.entities.forEach((entity) => {
 
-            this.entities.forEach((check) => {
-                const side = Game.isCollision(entity, check);
-                if (side) {
-                    console.log('collision');
-                    entity.onCollision(check, side);
-                    check.onCollision(entity, side);
+            if (!entity.dead) {
+                this.entities.forEach((check) => {
+                    const side = Game.isCollision(entity, check);
+                    if (side) {
+                        console.log('collision');
+                        entity.onCollision(check, side);
+                        check.onCollision(entity, side);
+                    }
+                });
+
+                if (entity instanceof Player) {
+                    entity.color = 'blue';
+                    entity.move(this.playerDirX, this.playerDirY, this.timePassed);
+                } else {
+                    // const inputs = [0, -1, 1];
+                    // const dirX = inputs[Math.floor((Math.random() * inputs.length))];
+                    // const dirY = inputs[Math.floor((Math.random() * inputs.length))];
+                    entity.move(-1, -1, this.timePassed);
                 }
-            });
-
-            if (entity instanceof Player) {
-                entity.color = 'blue';
-                entity.move(this.playerDirX, this.playerDirY, this.timePassed);
             }
-
-            // TODO: move other entities
         });
     }
 
@@ -160,6 +179,7 @@ export default class Game {
                     penetrationBottom = p.bottom - q.top;
                 }
 
+                // Check which side has the deepest penetration and return it
                 const maxPenetration = Math.max(penetrationLeft, penetrationRight, penetrationTop, penetrationBottom);
 
                 if (maxPenetration === 0) {
@@ -191,7 +211,9 @@ export default class Game {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.entities.forEach((entity) => {
-            entity.render(this.context);
+            if (!entity.dead) {
+                entity.render(this.context);
+            }
         });
     }
 

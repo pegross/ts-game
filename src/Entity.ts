@@ -7,6 +7,9 @@ export default abstract class Entity {
 
     canCollide: boolean;
     impassable: boolean;
+    deadly: boolean;
+    killable: boolean;
+    dead: boolean;
 
     protected state: State;
 
@@ -28,13 +31,17 @@ export default abstract class Entity {
 
     protected isStopped = false;
 
-    protected constructor(speed: number, posX: number, posY: number, width: number, height: number, canCollide = true, impassable = false) {
+    protected constructor(speed: number, posX: number, posY: number, width: number, height: number, canCollide = true, impassable = false, deadly = false, killable = false, dead = false) {
         this.state = State.IDLE;
         this.speed = speed;
         this.width = width;
         this.height = height;
         this.canCollide = canCollide;
         this.impassable = impassable;
+        this.deadly = deadly;
+        this.killable = killable;
+        this.dead = dead;
+
         this.setX(posX);
         this.setY(posY);
 
@@ -146,6 +153,11 @@ export default abstract class Entity {
     }
 
     onCollision(collider: Entity, side: Side): void {
+        if (this.killable && collider.deadly) {
+            this.dead = true;
+            Game.deregisterEntity(this);
+        }
+
         if (collider.impassable) {
             this.stop();
         }
