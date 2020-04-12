@@ -1,6 +1,7 @@
 import Game from './Game';
 import { DirectionX, DirectionY, Side, State } from './enums';
 import { Collision, Position } from './interfaces';
+import Player from './Player';
 
 export default abstract class Entity {
 
@@ -9,23 +10,33 @@ export default abstract class Entity {
 
     protected state: State;
 
-    protected speed: number;
-    protected posX: number;
-    protected posY: number;
-    protected width: number;
-    protected height: number;
+    top = 0;
+    bottom = 0;
+    right = 0;
+    left = 0;
+
+    oldTop = 0;
+    oldBottom = 0;
+    oldRight = 0;
+    oldLeft = 0;
+
+    protected speed = 0;
+    protected posX = 0;
+    protected posY = 0;
+    protected width = 0;
+    protected height = 0;
 
     protected isStopped = false;
 
     protected constructor(speed: number, posX: number, posY: number, width: number, height: number, canCollide = true, impassable = false) {
         this.state = State.IDLE;
         this.speed = speed;
-        this.posX = posX;
-        this.posY = posY;
         this.width = width;
         this.height = height;
         this.canCollide = canCollide;
         this.impassable = impassable;
+        this.setX(posX);
+        this.setY(posY);
 
         Game.registerEntity(this);
     }
@@ -34,49 +45,49 @@ export default abstract class Entity {
 
     move(x: DirectionX, y: DirectionY, ms: number): void {
         ms = Math.abs(ms);
-
-        this.getCollisions().forEach(collision => {
-            console.log('COLLISION ' + collision.side);
-
-            switch (collision.side) {
-                case Side.TOP:
-                    this.posY = collision.with.getY() - this.getHeight() - 1;
-                    break;
-                case Side.BOTTOM:
-                    this.posY = collision.with.getY() + collision.with.getHeight() + 1;
-                    break;
-                case Side.RIGHT:
-                    this.posX = collision.with.getX() - this.getWidth() - 1;
-                    break;
-                case Side.LEFT:
-                    this.posX = collision.with.getX() + collision.with.getWidth() + 1;
-                    break;
-            }
-        });
-
-        if (this.state > State.MOVING || this.getCollisions().length) {
+        if (this.state > State.MOVING) {
             return;
         }
 
         const addX = Math.round(this.speed * ms * x);
         if (this.posX + addX > Game.getWidth()) {
-            this.posX = 0;
+            this.setX(0);
         } else {
             if (this.posX - addX < 0) {
-                this.posX = Game.getWidth();
+                this.setX(Game.getWidth());
             }
         }
-        this.posX += addX;
+        let newX = this.getX() + addX;
 
         const addY = Math.round(this.speed * ms * y);
         if (this.posY + addY > Game.getHeight()) {
-            this.posY = 0;
+            this.setY(0);
         } else {
             if (this.posY - addY < 0) {
-                this.posY = Game.getHeight();
+                this.setY(Game.getHeight());
             }
         }
-        this.posY += addY;
+        let newY = this.getY() + addY;
+
+        this.getCollisions().forEach(collision => {
+            switch (collision.side) {
+                case Side.TOP:
+                    newY = collision.with.bottom + 1;
+                    break;
+                case Side.BOTTOM:
+                    newY = collision.with.top - 1 - this.getWidth();
+                    break;
+                case Side.RIGHT:
+                    newX = collision.with.left - 1 - this.getWidth();
+                    break;
+                case Side.LEFT:
+                    newX = collision.with.right + 1;
+                    break;
+            }
+        });
+        this.setX(newX);
+        this.setY(newY);
+
     }
 
     protected getCollisions(): Collision[] {
@@ -100,20 +111,30 @@ export default abstract class Entity {
         return { 'x': this.posX, 'y': this.posY };
     }
 
+    protected setX(x: number): void {
+        this.posX = x;
+        this.oldLeft = this.left;
+        this.oldRight = this.right;
+
+        this.left = x;
+        this.right = x + this.width;
+    }
+
+    protected setY(y: number): void {
+        this.posY = y;
+        this.oldTop = this.top;
+        this.oldBottom = this.bottom;
+
+        this.top = y;
+        this.bottom = y + this.height;
+    }
+
     getX(): number {
         return this.posX;
     }
 
-    setX(x: number): void {
-        this.posX = x;
-    }
-
     getY(): number {
         return this.posY;
-    }
-
-    setY(y: number): void {
-        this.posY = y;
     }
 
     getWidth(): number {
@@ -124,7 +145,7 @@ export default abstract class Entity {
         return this.height;
     }
 
-    onCollision(collider: Entity): void {
+    onCollision(collider: Entity, side: Side): void {
         if (collider.impassable) {
             this.stop();
         }

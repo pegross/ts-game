@@ -14,10 +14,10 @@ export enum DirectionY
 
 export enum Side
 {
-    TOP,
-    RIGHT,
-    BOTTOM,
-    LEFT
+    TOP = 'T',
+    RIGHT = 'R',
+    BOTTOM = 'B',
+    LEFT = 'L'
 }
 
 export enum State

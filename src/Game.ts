@@ -112,10 +112,11 @@ export default class Game {
         this.entities.forEach((entity) => {
 
             this.entities.forEach((check) => {
-                if (Game.isCollision(entity, check)) {
+                const side = Game.isCollision(entity, check);
+                if (side) {
                     console.log('collision');
-                    entity.onCollision(check);
-                    check.onCollision(entity);
+                    entity.onCollision(check, side);
+                    check.onCollision(entity, side);
                 }
             });
 
@@ -134,27 +135,58 @@ export default class Game {
         }
 
         // Main collision handling algorithm (Axis Aligned Bounding Box)
-        if (p.getX() < q.getX() + q.getWidth() && p.getX() + p.getWidth() > q.getX()) {
-            if (p.getY() < q.getY() + q.getHeight() && p.getY() + p.getHeight() > q.getY()) {
+        if (p.left <= q.right && p.right >= q.left) {
+            if (p.top <= q.bottom && p.bottom >= q.top) {
 
-                // Collision happened. Detect which side is closest to collision
-                const deltaX = q.getX() > p.getX() ? q.getX() - p.getX() + p.getWidth() : p.getX() - q.getX() + q.getWidth();
-                const deltaY = q.getY() > p.getY() ? q.getY() - p.getY() + p.getHeight() : p.getX() - q.getX() + q.getHeight();
-                console.log('deltaX ' + deltaX);
-                console.log('deltaY ' + deltaY);
+                let penetrationTop = 0;
+                let penetrationRight = 0;
+                let penetrationBottom = 0;
+                let penetrationLeft = 0;
 
-                if (deltaX < deltaY) {
-                    if (q.getX() > p.getX() + p.getWidth()) {
-                        return Side.RIGHT
-                    } else {
-                        return Side.LEFT;
+                // Calculate penetration depth
+                if (q.left < p.left && p.left < q.right && q.right < p.right) {
+                    penetrationLeft = q.right - p.left;
+                    if (p instanceof Player) {
+                        console.log('Pen Left' + penetrationLeft);
                     }
                 }
 
-                if (q.getY() > p.getY() + p.getHeight()) {
-                    return Side.TOP
-                } else {
-                    return Side.BOTTOM;
+                if (p.left < q.left && q.left < p.right && p.right < q.right) {
+                    penetrationRight = p.right - q.left;
+                    if (p instanceof Player) {
+                        console.log('Pen Right' + penetrationRight);
+                    }
+                }
+
+                if (q.top < p.top && p.top < q.bottom && q.bottom < p.bottom) {
+                    penetrationTop = q.bottom - p.top;
+                    if (p instanceof Player) {
+                        console.log('Pen Top' + penetrationTop);
+                    }
+                }
+
+                if (p.top < q.top && q.top < p.bottom && p.bottom < q.bottom) {
+                    penetrationBottom = p.bottom - q.top;
+                    if (p instanceof Player) {
+                        console.log('Pen Bottom' + penetrationBottom);
+                    }
+                }
+
+                const maxPenetration = Math.max(penetrationLeft, penetrationRight, penetrationTop, penetrationBottom);
+
+                if (maxPenetration === 0) {
+                    return false;
+                }
+
+                switch (maxPenetration) {
+                    case penetrationTop:
+                        return Side.TOP;
+                    case penetrationBottom:
+                        return Side.BOTTOM;
+                    case penetrationRight:
+                        return Side.RIGHT;
+                    case penetrationLeft:
+                        return Side.LEFT;
                 }
             }
         }

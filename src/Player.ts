@@ -1,6 +1,6 @@
 import Entity from './Entity';
 import Settings from './Settings';
-import { DirectionX, DirectionY, State } from './enums';
+import { DirectionX, DirectionY, Side, State } from './enums';
 
 export default class Player extends Entity {
 
@@ -27,8 +27,9 @@ export default class Player extends Entity {
         ctx.stroke();
     }
 
-    onCollision(collider: Entity): void {
-        super.onCollision(collider);
+    onCollision(collider: Entity, side: Side): void {
+        super.onCollision(collider, side);
+        console.log('Side: ' + side);
         this.color = 'red';
     }
 }

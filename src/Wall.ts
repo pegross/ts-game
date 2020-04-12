@@ -1,6 +1,6 @@
 import Entity from './Entity';
 import Settings from './Settings';
-import { DirectionX, DirectionY, State } from './enums';
+import { DirectionX, DirectionY, Side, State } from './enums';
 
 export default class Wall extends Entity {
 
@@ -17,6 +17,7 @@ export default class Wall extends Entity {
         ctx.stroke();
     }
 
-    onCollision(collider: Entity): void {
+    onCollision(collider: Entity, side: Side): void {
+        super.onCollision(collider, side);
     }
 }
