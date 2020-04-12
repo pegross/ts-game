@@ -146,30 +146,18 @@ export default class Game {
                 // Calculate penetration depth
                 if (q.left < p.left && p.left < q.right && q.right < p.right) {
                     penetrationLeft = q.right - p.left;
-                    if (p instanceof Player) {
-                        console.log('Pen Left' + penetrationLeft);
-                    }
                 }
 
                 if (p.left < q.left && q.left < p.right && p.right < q.right) {
                     penetrationRight = p.right - q.left;
-                    if (p instanceof Player) {
-                        console.log('Pen Right' + penetrationRight);
-                    }
                 }
 
                 if (q.top < p.top && p.top < q.bottom && q.bottom < p.bottom) {
                     penetrationTop = q.bottom - p.top;
-                    if (p instanceof Player) {
-                        console.log('Pen Top' + penetrationTop);
-                    }
                 }
 
                 if (p.top < q.top && q.top < p.bottom && p.bottom < q.bottom) {
                     penetrationBottom = p.bottom - q.top;
-                    if (p instanceof Player) {
-                        console.log('Pen Bottom' + penetrationBottom);
-                    }
                 }
 
                 const maxPenetration = Math.max(penetrationLeft, penetrationRight, penetrationTop, penetrationBottom);
