@@ -10,8 +10,17 @@ let mix = require('laravel-mix');
  | file for your application, as well as bundling up your JS files.
  |
  */
+mix.webpackConfig({
+    module: {
+        rules: [{
+            test: /\.tilemap$/i,
+            use: 'raw-loader'
+        }]
+    }
+});
 
 mix.ts('src/index.ts', 'public/dist/');
+mix.copyDirectory('src/assets', 'public/dist');
 
 mix.browserSync({
     proxy: false,

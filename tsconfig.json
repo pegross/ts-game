@@ -5,5 +5,13 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+    "files": [
+        "src/index.ts",
+        "src/global.d.ts"
+    ]
+//    "exclude": [
+//        "*.txt",
+//        "*.tilemap"
+//    ]
 }
