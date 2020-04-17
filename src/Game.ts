@@ -4,7 +4,7 @@ import Tile from './TileMap/Tile';
 
 export default class Game {
 
-    static tileSize = 100;
+    static readonly TILE_SIZE = 75;
 
     private static instance?: Game;
     private entities: Entity[] = [];

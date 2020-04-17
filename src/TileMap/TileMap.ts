@@ -21,7 +21,7 @@ export default class TileMap {
 
     load() {
         const lines = this.rawMapData.split('\n');
-        lines.pop();
+        lines.pop(); // last line is always empty, remove it
 
         let longest = 0;
 
@@ -42,6 +42,7 @@ export default class TileMap {
             }
         });
 
+        // fill the tiles array
         lines.forEach((line) => {
             line.split('').forEach((char) => {
                switch (char) {
@@ -53,24 +54,20 @@ export default class TileMap {
                }
             });
             console.log(this.tiles);
-        })
-
-        // const file = readFileSync('./maps/01.tilemap', 'utf-8');
-
-        // console.log(file);
+        });
     }
 
     render() {
         let x = 0;
-        let y = 0; // -Game.tileSize;
+        let y = 0;
         let numInRow = 0;
 
         this.tiles.forEach((tile) => {
             numInRow++;
             tile.render(x, y);
-            x += Game.tileSize;
-            if (numInRow >= this.width) {
-                y += Game.tileSize;
+            x += Game.TILE_SIZE;
+            if (numInRow === this.width) {
+                y += Game.TILE_SIZE;
                 numInRow = 0;
                 x = 0;
             }

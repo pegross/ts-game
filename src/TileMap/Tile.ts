@@ -3,7 +3,7 @@ import TileMap from './TileMap';
 
 export default class Tile {
 
-    private tile: string;
+    private readonly tile: string;
 
     constructor(tile: string) {
         this.tile = tile;
@@ -16,12 +16,12 @@ export default class Tile {
         const tileImage = new Image();
         tileImage.src = 'dist/' + this.getImageName(this.tile);
         tileImage.onload = () => {
-            ctx.drawImage(tileImage, x, y, Game.tileSize, Game.tileSize);
+            ctx.drawImage(tileImage, x, y, Game.TILE_SIZE, Game.TILE_SIZE);
         };
 
         ctx.drawImage(tileImage, x, y);
 
-        ctx.rect(x, y, Game.tileSize, Game.tileSize);
+        ctx.rect(x, y, Game.TILE_SIZE, Game.TILE_SIZE);
         ctx.strokeStyle = 'black';
         ctx.fillStyle = 'white';
         ctx.stroke();
