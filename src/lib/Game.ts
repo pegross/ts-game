@@ -7,7 +7,6 @@ export default class Game {
     static readonly TILE_SIZE = 75;
 
     private static instance?: Game;
-    private entities: Entity[] = [];
     private tileMap!: TileMap;
 
     // canvas and context must be set before starting the game
@@ -51,20 +50,6 @@ export default class Game {
         return this.get();
     }
 
-    static registerEntity(entity: Entity) {
-        Game.get().entities.push(entity);
-    }
-
-    static deregisterEntity(entity: Entity) {
-        const entities = Game.get().entities;
-        for (let i = 0; i <= entities.length; i++) {
-            if (entities[i] === entity) {
-                entities.splice(i, 1);
-                return;
-            }
-        }
-    }
-
     start(): void {
         if (!this.canvas || !this.context) {
             console.error('Game:start - Game cannot be started before setting the canvas');
@@ -81,7 +66,7 @@ export default class Game {
     private execDraw(): void {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.tileMap = new TileMap();
+        this.tileMap = TileMap.get();
         this.tileMap.load();
 
         this.tileMap.render();

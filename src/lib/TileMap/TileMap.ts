@@ -9,13 +9,33 @@ export default class TileMap {
     private width = 0; // in tiles
     private height = 0; // in tiles
 
+    private static instance?: TileMap;
     private rawMapData: string;
 
-    constructor() {
+    private constructor() {
         this.width = 0;
         this.rawMapData = mapData;
     }
 
+    static get(): TileMap {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new this();
+        return this.get();
+    }
+
+    tile(x: number, y: number): Tile | undefined {
+        if (x > this.width - 1 || y > this.height - 1) {
+            return;
+        }
+
+        const index = y * this.width + x;
+
+        return this.tiles[index];
+    }
+
+    // TODO: add possibility to load different .tilemap file
     load() {
         const lines = this.rawMapData.split('\n');
         lines.pop(); // last line is always empty, remove it
@@ -26,7 +46,7 @@ export default class TileMap {
         // determine longest line, this is the width
         lines.forEach((line) => {
             if (line.length > this.width) {
-               this.width = line.length;
+                this.width = line.length;
             }
         });
 
@@ -62,6 +82,7 @@ export default class TileMap {
                 }
             });
         });
+
     }
 
     render() {
