@@ -1,6 +1,7 @@
-import Entity from './Entity';
+import Entity from './Entity/Entity';
 import TileMap from './TileMap/TileMap';
 import Tile from './TileMap/Tile/Tile';
+import Player from './Entity/Player';
 
 export default class Game {
 
@@ -70,6 +71,9 @@ export default class Game {
         this.tileMap.load();
 
         this.tileMap.render();
+
+        // tslint:disable-next-line:no-unused-expression
+        new Player(1, 1);
 
         //
         // this.entities.forEach((entity) => {
