@@ -1,4 +1,4 @@
-import Game from './Game';
+import Game from './lib/Game';
 
 window.onload = () => {
     const canvas = document.getElementById('game');

@@ -1,6 +1,6 @@
 import Entity from './Entity';
 import TileMap from './TileMap/TileMap';
-import Tile from './TileMap/Tile';
+import Tile from './TileMap/Tile/Tile';
 
 export default class Game {
 
