@@ -71,12 +71,12 @@ export default class TileMap {
                 this.tiles.push(tile);
 
                 // Advance the x position and number in row
-                x += Game.TILE_SIZE;
+                x++;
                 numInRow++;
 
                 // If row end is reached, jump to next line
                 if (numInRow === this.width) {
-                    y += Game.TILE_SIZE;
+                    y++;
                     numInRow = 0;
                     x = 0;
                 }

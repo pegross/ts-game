@@ -1,10 +1,11 @@
 import Game from './lib/Game';
 
 window.onload = () => {
-    const canvas = document.getElementById('game');
+    const canvasBack = document.getElementById('game-lay-1');
+    const canvasFront = document.getElementById('game-lay-2');
 
-    if (canvas instanceof HTMLCanvasElement) {
-        Game.setCanvas(canvas).start();
+    if (canvasFront instanceof HTMLCanvasElement && canvasBack instanceof HTMLCanvasElement) {
+        Game.setCanvas(canvasBack, canvasFront).start();
         // @ts-ignore
         window.myGame = Game;
     } else {

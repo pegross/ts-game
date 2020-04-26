@@ -11,33 +11,24 @@ export default class Game {
     private tileMap!: TileMap;
 
     // canvas and context must be set before starting the game
-    canvas!: HTMLCanvasElement;
-    context!: CanvasRenderingContext2D;
+    canvasFront!: HTMLCanvasElement;
+    canvasBack!: HTMLCanvasElement;
+    contextFront!: CanvasRenderingContext2D;
+    contextBack!: CanvasRenderingContext2D;
 
     private constructor() {
-        window.addEventListener('keypress', e => {
-            console.log(e);
-            switch (e.key) {
-                case 'a':
-                    break;
-                case 'd':
-                    break;
-                case 'w':
-                    break;
-                case 's':
-            }
-        });
-
         window.addEventListener('resize', () => {
             this.alignCanvas();
         });
 
     }
 
-    static setCanvas(canvas: HTMLCanvasElement): Game {
+    static setCanvas(canvasBack: HTMLCanvasElement, canvasFront: HTMLCanvasElement): Game {
         const game = Game.get();
-        game.canvas = canvas;
-        game.context = (canvas.getContext('2d') as CanvasRenderingContext2D);
+        game.canvasBack = canvasBack;
+        game.canvasFront = canvasFront;
+        game.contextBack = (canvasBack.getContext('2d') as CanvasRenderingContext2D);
+        game.contextFront = (canvasFront.getContext('2d') as CanvasRenderingContext2D);
         game.alignCanvas();
 
         return game;
@@ -52,11 +43,14 @@ export default class Game {
     }
 
     start(): void {
-        if (!this.canvas || !this.context) {
+        if (!this.canvasBack || !this.contextBack || !this.canvasFront || !this.canvasFront) {
             console.error('Game:start - Game cannot be started before setting the canvas');
         }
 
-        this.loop();
+        // tslint:disable-next-line:no-unused-expression
+        new Player(1, 1);
+
+        this.turn();
     }
 
 
@@ -65,40 +59,34 @@ export default class Game {
     }
 
     private execDraw(): void {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+        this.contextFront.clearRect(0, 0, this.canvasFront.width, this.canvasFront.height);
+        this.contextBack.clearRect(0, 0, this.canvasBack.width, this.canvasBack.height);
         this.tileMap = TileMap.get();
         this.tileMap.load();
-
         this.tileMap.render();
-
-        // tslint:disable-next-line:no-unused-expression
-        new Player(1, 1);
-
-        //
-        // this.entities.forEach((entity) => {
-        //     entity.render(this.context);
-        // });
     }
 
-    private loop(): void {
-
-        // this.fetchEvents();
+    // Everything takes it's turn. Turns are mostly triggered by player movement
+    turn(): void {
+        console.log('Another turn has passed.');
         this.execCalc();
         this.execDraw();
-        // requestAnimationFrame(() => {
-        //     this.loop();
-        // });
     }
 
     private alignCanvas() {
-        if (!this.canvas) {
+        if (!this.canvasBack || !this.canvasFront) {
             console.error('Game:alignCanvas - canvas is not set');
             return;
         }
 
-        this.canvas.width = this.canvas.clientWidth;
-        this.canvas.height = this.canvas.clientHeight;
+        const width = this.canvasBack.clientWidth;
+        const height = this.canvasBack.clientHeight;
+
+        this.canvasBack.width = width;
+        this.canvasBack.height = height;
+        this.canvasFront.width = width;
+        this.canvasFront.height = height;
+
         this.execDraw()
     }
 

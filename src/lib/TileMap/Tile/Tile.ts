@@ -11,6 +11,7 @@ export default abstract class Tile {
     protected x: number;
     protected y: number;
 
+    protected loadedImage: HTMLImageElement | undefined;
 
     private entity: Entity | undefined;
 
@@ -20,16 +21,18 @@ export default abstract class Tile {
     }
 
     render(): void {
-        const ctx = Game.get().context;
-        ctx.beginPath();
+        const ctx = Game.get().contextBack;
 
-        const tileImage = new Image();
-        tileImage.src = 'dist/' + this.imageName;
-        tileImage.onload = () => {
-            ctx.drawImage(tileImage, this.x, this.y, Game.TILE_SIZE, Game.TILE_SIZE);
-        };
-
-        ctx.drawImage(tileImage, this.x, this.y);
+        if (!this.loadedImage) {
+            const tileImage = new Image();
+            tileImage.src = 'dist/' + this.imageName;
+            tileImage.onload = () => {
+                this.loadedImage = tileImage;
+                ctx.drawImage(this.loadedImage, this.x * Game.TILE_SIZE, this.y * Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE);
+            };
+        } else {
+            ctx.drawImage(this.loadedImage, this.x * Game.TILE_SIZE, this.y * Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE);
+        }
 
         if (this.entity) {
             this.entity.render();
@@ -58,16 +61,16 @@ export default abstract class Tile {
         }
     }
 
+    leave() {
+        this.entity = undefined;
+    }
+
     getX(): number {
         return this.x;
     }
 
     getY(): number {
         return this.y;
-    }
-
-    leave(entity: Entity) {
-        this.entity = undefined;
     }
 
 }
