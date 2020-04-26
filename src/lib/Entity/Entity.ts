@@ -23,12 +23,12 @@ export default abstract class Entity {
         if (tile) {
             const ctx = Game.get().contextFront;
 
-            // This allows for multiple layers of png
-            // @see https://stackoverflow.com/a/16388454
             ctx.save();
 
+            // Manipulating this value will allow flipping the sprite
             let dx = tile.getX() * Game.TILE_SIZE;
 
+            // Flip the sprite if we're not facing right
             if (!this.faceRight) {
                 ctx.translate(tile.getX(), tile.getY());
                 ctx.scale(-1, 1);
